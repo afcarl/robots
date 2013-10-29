@@ -43,6 +43,7 @@ class Vocalizer(object):
         self.s_feats = (0, 1)
         self.m_feats = (-3, -2, -1)
         self.m_bounds = 3*((0.0, 1.0),)
+        self.s_bounds = ((2.4, 7.5), (7.4, 22.1))
 
     def _legal_order(self, order):
         """Return True if an orders parameters are between bounds"""
@@ -97,5 +98,5 @@ class Vocalizer(object):
             C_2 = ((2 + w_2)*F_3 - w_2*F_4)/2
         else:
             assert False
-        return C_1/8.0, C_2/16.0
+        return C_1, C_2
 
