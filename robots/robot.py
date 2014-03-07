@@ -29,6 +29,14 @@ class Robot(object):
         y = self._execute_order(x, **kwargs) # f to be provided
         return self._post_y(y, x)
 
+    @property
+    def real_s_bounds(self):
+        return self.s_bounds
+
+    @real_s_bounds.setter
+    def real_s_bounds(self):
+        raise NotImplementedError
+
     def _pre_x(self, x):
         """Perform test on x and transform it into a tuple"""
         if pandas_available and type(x) == pandas.Series:

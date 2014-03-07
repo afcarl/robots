@@ -1,28 +1,31 @@
-import testenv
+from __future__ import print_function, division
+import unittest
+
+import forest
+
+import env
 import robots
 
-# Robot
-def test_kin():
-    """Test if KinematicArm2D instanciate properly"""
-    check = True
+class TestMultiKin(unittest.TestCase):
 
-    arm = robots.KinematicArm2D(dim = 6)
-    arm = robots.KinematicArm2D(dim = 1, lengths = 1.0)
-    check = check and arm.dim == 1
-    arm = robots.KinematicArm2D(dim = 6, lengths = 1.0, limits = (-1.0, 1.0))
-    check = check and arm.m_feats == tuple(range(-6, 0))
-    arm = robots.KinematicArm2D(dim = 6, lengths = 6*(1.0,), limits = 6*((-20.0, 20.0),))
-    check = check and arm.m_bounds == 6*((-20.0, 20.0),)
-    arm = robots.KinematicArm2D(dim = 12, m_feats = range(12))
-    check = check and arm.dim == 12
-    arm = robots.KinematicArm2D(dim = 12, s_feats = range(2))
+    def test_init(self):
 
-    return check
+        def test_kin():
+            """Test if KinematicArm2D instanciates properly"""
+            check = True
 
-tests = [test_kin]
+            arm = robots.KinematicArm2D(dim = 6)
+            self.assertEqual(arm.dim, 6)
 
-if __name__ == "__main__":
-    print("\033[1m%s\033[0m" % (__file__,))
-    for t in tests:
-        print('%s %s' % ('\033[1;32mPASS\033[0m' if t() else
-                         '\033[1;31mFAIL\033[0m', t.__doc__))
+            cfg = forest.Tree()
+            cfg.dim = 1
+            cfg.lengths = 1.0
+            cfg.limits = (-1.0, 1.0)
+            arm = robots.KinematicArm2D(cfg)
+            self.assertEqual(arm.dim, 1)
+
+            cfg.dim = 6
+            arm = robots.KinematicArm2D(cfg)
+            self.assertEqual(arm.m_feats, tuple(range(-6, 0)))
+            self.assertEqual(arm.s_feats, (0, 1))
+            self.assertEqual(arm.m_bounds, 6*((-1.0, 1.0),))

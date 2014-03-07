@@ -1,9 +1,11 @@
+from __future__ import print_function, division
+
 import math, random
 import collections
-import treedict
-
 
 import pandas
+
+import forest
 
 from . import robot
 
@@ -121,27 +123,39 @@ class MultiArm2D(object):
         obs = pandas.Series(order, range(-len(self.bounds), 0))
         return obs.append(self.forward_kin(order))
 
-defaultcfg = treedict.TreeDict()
-defaultcfg.dim     = 6
-defaultcfg.limits  = (-150, 150)
-defaultcfg.lengths = 1.0
-defaultcfg.s_feats = None
-defaultcfg.m_feats = None
+defcfg = forest.Tree()
+defcfg._isinstance('dim', int)
+defcfg.dim = 6
+defcfg._isinstance('limits', collections.Iterable)
+defcfg.limits  = (-150, 150)
+defcfg._isinstance('lengths', (float, collections.Iterable))
+defcfg.lengths = 1.0
+defcfg._isinstance('s_feats', (collections.Iterable))
+defcfg._isinstance('m_feats', (collections.Iterable))
 
 class KinematicArm2D(robot.Robot):
     """Interface for the kinematics of an arm"""
 
     def __init__(self, cfg = None, dim = 6):
+        """\
+        :param cfg:  Configuration parameters:
+                     cfg.dim      the number of joints
+                     cfg.limits   the max angles of each joints
+                     cfg.lengths  the length of each joints
+                     cfg.s_feats  the id of the sensory channels
+                     cfg.m_feats  the id of the motor channels
+        """
         self.cfg = cfg
         if self.cfg is None:
-            self.cfg = treedict.TreeDict()
+            self.cfg = forest.Tree()
             self.cfg.dim = dim
-        self.cfg.update(defaultcfg, overwrite = False)
+        self.cfg._update(deftcfg, overwrite = False)
 
         self.dim      = self.cfg.dim
         self.m_feats  = tuple(range(-self.dim, 0)) if self.cfg.m_feats is None else self.cfg.m_feats
         self.m_bounds = tuple(self.cfg.limits for _ in range(self.dim))
         self.s_feats  = (0, 1) if self.cfg.s_feats is None else self.cfg.s_feats
+        self.s_fixed  = (None, None)
         self.name = 'KinematicArm2D'
         self._init_robot(self.cfg.lengths, self.cfg.limits)
 
@@ -172,10 +186,13 @@ class KinematicArm2D(robot.Robot):
             feats = None if i < len(self.m_feats)-1 else (0, 1, None) # x,y for the tip only
             j = self._multiarm.add_joint(j, RevJoint(length = self.lengths[i], limits = self.m_bounds[i], orientation = 0.0, feats = feats))
 
+        diameter = sum(self.lengths)
+        self.s_bounds = ((-diameter, diameter), (-diameter, diameter))
+
     def execute_order(self, order):
         order_t = self._pre_x(order)
         effect = self._multiarm.forward_kin(order)
-        return self._post_y(effect, order)
+        return tuple(self._post_y(effect, order))
 
     def __repr__(self):
         return "KinematicArm2D(dim = {}, lengths = {}, m_bounds = {})".format(
