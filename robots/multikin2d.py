@@ -149,7 +149,7 @@ class KinematicArm2D(robot.Robot):
         if self.cfg is None:
             self.cfg = forest.Tree()
             self.cfg.dim = dim
-        self.cfg._update(deftcfg, overwrite = False)
+        self.cfg._update(defcfg, overwrite = False)
 
         self.dim      = self.cfg.dim
         self.m_feats  = tuple(range(-self.dim, 0)) if self.cfg.m_feats is None else self.cfg.m_feats
