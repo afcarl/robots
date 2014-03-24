@@ -1,22 +1,22 @@
 import importlib
-import treedict
+import forest
 
 
-defaultcfg = treedict.TreeDict()
+defcfg = forest.Tree()
 
-defaultcfg.filters.s_feats = None
-defaultcfg.filters.s_feats_desc = "The mask of the features who want to get back from the sensors"
+defcfg['filters.s_feats'] = None
+defcfg['filters.s_feats_desc'] = "The mask of the features who want to get back from the sensors"
 
-defaultcfg.filters.s_bounds_factor = None
-defaultcfg.filters.s_bounds_factor_desc = "The factor to multiply the s_bounds of the robots, dimension-wise"
+defcfg['filters.s_bounds_factor'] = None
+defcfg['filters.s_bounds_factor_desc'] = "The factor to multiply the s_bounds of the robots, dimension-wise"
 
-defaultcfg.filters.uniformize = False
+defcfg['filters.uniformize'] = False
 
-defaultcfg.verbose = False
+defcfg['verbose'] = False
 
 def build_robot(cfg):
 
-    cfg.update(defaultcfg, overwrite = False)
+    cfg._update(defcfg, overwrite=False)
     modpath = cfg.robotclass.split('.')
     rclass = importlib.import_module('.'.join(modpath[:-1]))
     rclass = getattr(rclass, modpath[-1])

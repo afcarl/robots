@@ -1,4 +1,4 @@
-import testenv
+import env
 import robots
 import random
 
@@ -12,7 +12,7 @@ def test_kin():
     min_c1, max_c1 = float('+inf'), float('-inf')
     min_c2, max_c2 = float('+inf'), float('-inf')
 
-    for i in range(10000000):
+    for i in range(10000):
         p = random.random()
         h = random.random()
         r = random.random()
